@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { DayChart } from "./components/DayChart";
 import { RiskGauge } from "./components/RiskGauge";
 import { SearchBox } from "./components/SearchBox";
@@ -6,7 +6,7 @@ import { WhenPicker } from "./components/WhenPicker";
 import { loadIndex, loadMeta, loadStreet, searchStreets, type IndexEntry, type Meta, type Street } from "./lib/data";
 import { currentPosition, locationErrorMessage, reverseGeocode } from "./lib/geo";
 import { parseAddress, prettyStreet } from "./lib/normalize";
-import { dayProfile, findPlace, frequencyText, quietestSoon, weekdayOf, windowRisk, type Place } from "./lib/risk";
+import { dayProfile, findPlace, frequencyText, LEVELS, quietestSoon, weekdayOf, windowRisk, type Place } from "./lib/risk";
 
 const RECENT_KEY = "recent-searches";
 
@@ -116,10 +116,12 @@ export default function App() {
     <div className="app">
       <header className="top">
         <div className="brand">
-          <NoPLogo />
+          <Logo />
           <div>
-            <h1>Ticket Risk TO</h1>
-            <p className="small">On your side, not the meter's.</p>
+            <h1>
+              Ticket Risk <span className="to-badge">TO</span>
+            </h1>
+            <p className="tagline">On your side, not the meter's.</p>
           </div>
         </div>
         <SearchBox
@@ -133,11 +135,21 @@ export default function App() {
         />
       </header>
 
-      <main>
+      <main key={result.status === "found" ? result.address : result.status}>
         {loadError && <p className="notice error">{loadError}</p>}
         {!loadError && !meta && <Skeleton />}
 
-        {meta && result.status === "idle" && <Intro meta={meta} onPick={(a) => { setQuery(a); void lookup(a); }} />}
+        {meta && result.status === "idle" && (
+          <Intro
+            meta={meta}
+            locating={locating}
+            onLocate={locate}
+            onPick={(a) => {
+              setQuery(a);
+              void lookup(a);
+            }}
+          />
+        )}
         {result.status === "loading" && <Skeleton />}
         {result.status === "error" && <p className="notice error">{result.message}</p>}
         {result.status === "missing" && (
@@ -180,7 +192,7 @@ export default function App() {
       </main>
 
       {meta && (
-        <footer className="muted small">
+        <footer>
           <p>
             Based on {meta.tickets.toLocaleString()} City of Toronto parking tickets from {meta.from} to {meta.to}
             {meta.excludedCodes.includes("3") && ", not counting private-property tickets"}. Source:{" "}
@@ -233,26 +245,26 @@ function ResultView({ meta, street, number, start, isNow, hours, chartDay, onSta
 
   return (
     <>
-      <section className="card hero">
-        <p className="where">{placeLabel(place, pretty)}</p>
+      <section className={`card hero level-${risk.level}`} style={{ "--i": 0 } as React.CSSProperties}>
+        <div className="hero-head">
+          <p className="where">{placeLabel(place, pretty)}</p>
+          <span className="pill">{LEVELS[risk.level].label} risk</span>
+        </div>
         <RiskGauge score={risk.score} level={risk.level} />
         <p className="summary">{frequencyText(risk.expected)}</p>
-        <p className="muted small center">
-          {isNow ? "Right now" : start.toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" })}{" "}
-          for {hours < 1 ? "30 min" : `${hours} hr`}
-        </p>
         {tip && tip.score < risk.score - 15 && (
-          <p className="tip">
-            Dodge it: park at{" "}
-            <button type="button" className="link" onClick={() => onStart(tip.at)}>
-              {tip.at.toLocaleTimeString(undefined, { weekday: "short", hour: "numeric" })}
-            </button>{" "}
-            (risk {tip.score})
-          </p>
+          <button type="button" className="tip" onClick={() => onStart(tip.at)}>
+            <span className="tip-icon" aria-hidden>
+              ↓
+            </span>
+            <span>
+              Dodge it: park at <strong>{tip.at.toLocaleTimeString(undefined, { weekday: "short", hour: "numeric" })}</strong>{" "}
+              instead (risk {tip.score})
+            </span>
+          </button>
         )}
+        <WhenPicker start={isNow ? null : start} hours={hours} onStart={onStart} onHours={onHours} />
       </section>
-
-      <WhenPicker start={isNow ? null : start} hours={hours} onStart={onStart} onHours={onHours} />
 
       <DayChart
         rates={dayProfile(place, meta.weeks, weekday)}
@@ -269,42 +281,47 @@ function ResultView({ meta, street, number, start, isNow, hours, chartDay, onSta
         }}
       />
 
-      <section className="card">
-        <h2>Most common tickets on {pretty}</h2>
+      <section className="card" style={{ "--i": 2 } as React.CSSProperties}>
+        <h2>What gets ticketed on {pretty}</h2>
         <ul className="list">
           {street.i.map(([idx, count]) => {
             const [code, desc, fine] = meta.infractions[idx];
+            const share = Math.round((count / totalTop) * 100);
             return (
               <li key={code + desc}>
-                <div>
+                <div className="list-row">
                   <span>{describeInfraction(desc)}</span>
-                  <span className="muted small"> · ${fine}</span>
+                  <span className="fine">${fine}</span>
                 </div>
-                <div className="meter" aria-label={`${Math.round((count / totalTop) * 100)}%`}>
-                  <span style={{ width: `${(count / totalTop) * 100}%` }} />
+                <div className="meter" role="img" aria-label={`${share}% of these tickets`}>
+                  <span style={{ width: `${share}%` }} />
                 </div>
               </li>
             );
           })}
         </ul>
-        <p className="muted small">Average fine here: ${street.f}</p>
+        <p className="muted small">Average fine on this street: ${street.f}</p>
       </section>
 
       {topBlocks.length > 1 && (
-        <section className="card">
+        <section className="card" style={{ "--i": 3 } as React.CSSProperties}>
           <h2>Busiest blocks on {pretty}</h2>
-          <ul className="list blocks">
-            {topBlocks.map(([startNo, count]) => (
+          <ol className="blocks">
+            {topBlocks.map(([startNo, count], i) => (
               <li key={startNo}>
                 <button type="button" className="row-button" onClick={() => onPickBlock(startNo)}>
-                  <span>
+                  <span className="rank">{i + 1}</span>
+                  <span className="row-main">
                     {startNo}–{startNo + 99} {pretty}
+                    <span className="muted small">{count.toLocaleString()} tickets</span>
                   </span>
-                  <span className="muted small">{count.toLocaleString()} tickets</span>
+                  <span className="chev" aria-hidden>
+                    ›
+                  </span>
                 </button>
               </li>
             ))}
-          </ul>
+          </ol>
         </section>
       )}
     </>
@@ -339,39 +356,65 @@ function describeInfraction(desc: string): string {
   return desc.charAt(0) + desc.slice(1).toLowerCase();
 }
 
-function Intro({ meta, onPick }: { meta: Meta; onPick: (a: string) => void }) {
+function Intro({
+  meta,
+  locating,
+  onLocate,
+  onPick,
+}: {
+  meta: Meta;
+  locating: boolean;
+  onLocate: () => void;
+  onPick: (a: string) => void;
+}) {
   const examples = ["622 College St", "300 Queen St W", "1000 Bay St", "2100 Danforth Ave"];
   return (
-    <section className="card intro">
-      <h2>Don't donate to the City</h2>
-      <p className="muted">
-        Toronto writes about 2 million parking tickets a year. Type a street or tap the location button and we'll
-        tell you how hard that block gets ticketed at the time you're parking, using{" "}
-        {meta.tickets.toLocaleString()} of them.
-      </p>
-      <div className="chips wrap">
-        {examples.map((e) => (
-          <button key={e} type="button" className="chip" onClick={() => onPick(e)}>
-            {e}
-          </button>
-        ))}
-      </div>
-    </section>
+    <>
+      <section className="card intro" style={{ "--i": 0 } as React.CSSProperties}>
+        <h2>Don't donate to the City.</h2>
+        <p className="muted">See how hard your block gets ticketed before you walk away from the car.</p>
+        <button type="button" className="cta" onClick={onLocate} disabled={locating}>
+          {locating ? <span className="spinner" aria-hidden /> : <PinIcon />}
+          {locating ? "Finding your street…" : "Check where I'm parked"}
+        </button>
+        <p className="or muted small">or try one of these</p>
+        <div className="chips wrap">
+          {examples.map((e) => (
+            <button key={e} type="button" className="chip" onClick={() => onPick(e)}>
+              {e}
+            </button>
+          ))}
+        </div>
+      </section>
+      <section className="stats" style={{ "--i": 1 } as React.CSSProperties} aria-label="About the data">
+        <div>
+          <strong>{(meta.tickets / 1e6).toFixed(1)}M</strong>
+          <span>tickets analysed</span>
+        </div>
+        <div>
+          <strong>{meta.streets.toLocaleString()}</strong>
+          <span>streets</span>
+        </div>
+        <div>
+          <strong>{meta.years.length}</strong>
+          <span>years of data</span>
+        </div>
+      </section>
+    </>
   );
 }
 
-/** A parking "P" with a red slash through it. */
-function NoPLogo() {
+function PinIcon() {
   return (
-    <span className="logo" aria-hidden>
-      <svg viewBox="0 0 48 48">
-        <circle cx="24" cy="24" r="22" fill="#fff" />
-        <path d="M18 36V12h8.5c5.3 0 8.5 3 8.5 7.8s-3.2 7.8-8.5 7.8H23V36z M23 23.3h3.2c2.4 0 3.7-1.3 3.7-3.5s-1.3-3.5-3.7-3.5H23z" fill="var(--brand)" />
-        <circle cx="24" cy="24" r="19.5" fill="none" stroke="var(--slash)" strokeWidth="4.5" />
-        <path d="M10.2 10.2 37.8 37.8" stroke="var(--slash)" strokeWidth="4.5" />
-      </svg>
-    </span>
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
+      <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" strokeLinejoin="round" />
+      <circle cx="12" cy="9.5" r="2.5" />
+    </svg>
   );
+}
+
+function Logo() {
+  return <img className="logo" src={`${import.meta.env.BASE_URL}icons/icon.svg`} alt="" width="44" height="44" />;
 }
 
 function Skeleton() {

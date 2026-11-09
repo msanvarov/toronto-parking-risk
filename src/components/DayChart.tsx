@@ -1,4 +1,5 @@
-import { levelFor, scoreFromRate } from "../lib/risk";
+import type React from "react";
+import { levelFor, scoreFromRate, weekdayOf } from "../lib/risk";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -12,16 +13,18 @@ interface Props {
   onHour: (h: number) => void;
 }
 
-const hourLabel = (h: number) => (h === 0 ? "12a" : h === 12 ? "12p" : h < 12 ? `${h}a` : `${h - 12}p`);
+const hourLabel = (h: number) => (h === 0 ? "12am" : h === 12 ? "12pm" : h < 12 ? `${h}am` : `${h - 12}pm`);
 
 /** 24 bars, one per hour, coloured by risk level. Tap a bar to start there. */
 export function DayChart({ rates, percentiles, weekday, highlight, onWeekday, onHour }: Props) {
   const max = Math.max(...rates, 1e-9);
+  const now = new Date();
+  const nowHour = weekdayOf(now) === weekday ? now.getHours() : -1;
   return (
-    <section className="card">
+    <section className="card" style={{ "--i": 1 } as React.CSSProperties}>
       <div className="card-head">
-        <h2>Through the day</h2>
-        <span className="muted small">Tap an hour</span>
+        <h2>Best and worst times</h2>
+        <span className="muted small">Tap a bar to check it</span>
       </div>
       <div className="days" role="tablist" aria-label="Day of week">
         {DAYS.map((d, i) => (
@@ -38,21 +41,27 @@ export function DayChart({ rates, percentiles, weekday, highlight, onWeekday, on
               key={h}
               type="button"
               role="listitem"
-              className={`bar level-${levelFor(score)}${highlight.has(h) ? " selected" : ""}`}
+              className={`bar level-${levelFor(score)}${highlight.has(h) ? " selected" : ""}${h === nowHour ? " now" : ""}`}
               onClick={() => onHour(h)}
               aria-label={`${hourLabel(h)}: risk ${score}`}
             >
-              <span style={{ height: `${Math.max(3, (r / max) * 100)}%` }} />
+              <span style={{ height: `${Math.max(4, (r / max) * 100)}%` }} />
             </button>
           );
         })}
       </div>
       <div className="bar-axis muted small" aria-hidden>
-        <span>12a</span>
-        <span>6a</span>
-        <span>12p</span>
-        <span>6p</span>
-        <span>11p</span>
+        <span>12am</span>
+        <span>6am</span>
+        <span>12pm</span>
+        <span>6pm</span>
+        <span>11pm</span>
+      </div>
+      <div className="legend small" aria-hidden>
+        <span className="level-low">Low</span>
+        <span className="level-moderate">Moderate</span>
+        <span className="level-high">High</span>
+        <span className="level-very-high">Very high</span>
       </div>
     </section>
   );

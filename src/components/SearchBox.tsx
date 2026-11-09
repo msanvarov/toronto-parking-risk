@@ -58,7 +58,7 @@ export function SearchBox({ index, value, onChange, onSubmit, onLocate, locating
           autoComplete="off"
           autoCapitalize="words"
           enterKeyHint="search"
-          placeholder="Street or address, e.g. 622 College St"
+          placeholder="Street or address"
           value={value}
           role="combobox"
           aria-expanded={open && suggestions.length > 0}
