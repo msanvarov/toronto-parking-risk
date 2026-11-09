@@ -116,12 +116,10 @@ export default function App() {
     <div className="app">
       <header className="top">
         <div className="brand">
-          <span className="logo" aria-hidden>
-            P
-          </span>
+          <NoPLogo />
           <div>
             <h1>Ticket Risk TO</h1>
-            <p className="muted small">How likely is a parking ticket here?</p>
+            <p className="small">On your side, not the meter's.</p>
           </div>
         </div>
         <SearchBox
@@ -192,6 +190,7 @@ export default function App() {
             .
           </p>
           <p>This shows where and when tickets are usually written. It's not a guarantee — always read the signs.</p>
+          <p>Independent project. Not affiliated with the City of Toronto, Toronto Police or the Toronto Parking Authority.</p>
         </footer>
       )}
     </div>
@@ -244,7 +243,7 @@ function ResultView({ meta, street, number, start, isNow, hours, chartDay, onSta
         </p>
         {tip && tip.score < risk.score - 15 && (
           <p className="tip">
-            Quieter at{" "}
+            Dodge it: park at{" "}
             <button type="button" className="link" onClick={() => onStart(tip.at)}>
               {tip.at.toLocaleTimeString(undefined, { weekday: "short", hour: "numeric" })}
             </button>{" "}
@@ -344,10 +343,11 @@ function Intro({ meta, onPick }: { meta: Meta; onPick: (a: string) => void }) {
   const examples = ["622 College St", "300 Queen St W", "1000 Bay St", "2100 Danforth Ave"];
   return (
     <section className="card intro">
-      <h2>Check before you park</h2>
+      <h2>Don't donate to the City</h2>
       <p className="muted">
-        Type a street or address, or tap the location button. We'll score how often tickets get written there at the
-        time you're parking, using {meta.tickets.toLocaleString()} real tickets.
+        Toronto writes about 2 million parking tickets a year. Type a street or tap the location button and we'll
+        tell you how hard that block gets ticketed at the time you're parking, using{" "}
+        {meta.tickets.toLocaleString()} of them.
       </p>
       <div className="chips wrap">
         {examples.map((e) => (
@@ -357,6 +357,20 @@ function Intro({ meta, onPick }: { meta: Meta; onPick: (a: string) => void }) {
         ))}
       </div>
     </section>
+  );
+}
+
+/** A parking "P" with a red slash through it. */
+function NoPLogo() {
+  return (
+    <span className="logo" aria-hidden>
+      <svg viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r="22" fill="#fff" />
+        <path d="M18 36V12h8.5c5.3 0 8.5 3 8.5 7.8s-3.2 7.8-8.5 7.8H23V36z M23 23.3h3.2c2.4 0 3.7-1.3 3.7-3.5s-1.3-3.5-3.7-3.5H23z" fill="var(--brand)" />
+        <circle cx="24" cy="24" r="19.5" fill="none" stroke="var(--slash)" strokeWidth="4.5" />
+        <path d="M10.2 10.2 37.8 37.8" stroke="var(--slash)" strokeWidth="4.5" />
+      </svg>
+    </span>
   );
 }
 

@@ -1,6 +1,6 @@
 # Ticket Risk TO
 
-A mobile-first web app that tells you how likely a parking ticket is on a Toronto street, right now or at a time you pick.
+A mobile-first web app that tells you how likely a parking ticket is on a Toronto street, right now or at a time you pick. Parking-sign green, but on the driver's side.
 
 Type an address (or tap the location button), choose how long you're parking, and you get:
 
@@ -80,3 +80,5 @@ public/sw.js            offline cache
 This shows patterns from past tickets. It's not legal advice and not a guarantee. Always read the signs.
 
 Data: Contains information licensed under the [Open Government Licence – Toronto](https://open.toronto.ca/open-data-license/).
+
+Independent project. Not affiliated with the City of Toronto, Toronto Police or the Toronto Parking Authority (Green P).
