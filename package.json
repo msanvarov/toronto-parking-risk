@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "data": "python3 scripts/build_data.py --years 2024 2025"
+    "data": "python3 scripts/build_data.py --latest 2"
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",

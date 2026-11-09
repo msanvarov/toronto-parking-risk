@@ -1,0 +1,44 @@
+name: Update ticket data
+
+# The City publishes each year's tickets once, usually in March–May of the
+# following year. This checks monthly and opens a pull request when a new
+# year is out. Merging it redeploys the site (Netlify, Pages, etc.).
+on:
+  schedule:
+    - cron: "17 14 1 * *" # 1st of every month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check for a newer year
+        id: check
+        run: python3 scripts/build_data.py --check
+
+      - name: Rebuild data
+        if: steps.check.outputs.changed == 'true'
+        run: python3 scripts/build_data.py --years ${{ steps.check.outputs.years }}
+
+      - name: Open pull request
+        if: steps.check.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: data/update-${{ steps.check.outputs.slug }}
+          commit-message: "Update ticket data to ${{ steps.check.outputs.years }}"
+          title: "Update ticket data to ${{ steps.check.outputs.years }}"
+          body: |
+            The City of Toronto published new parking ticket data.
+            This rebuilds `public/data/` from the years ${{ steps.check.outputs.years }}.
+
+            Merge to update the live site.
+          add-paths: public/data

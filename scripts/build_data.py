@@ -2,7 +2,9 @@
 """Build the app's static data from the City of Toronto parking ticket dataset.
 
 Usage:
-    python3 scripts/build_data.py --years 2024 2025
+    python3 scripts/build_data.py                    # newest 2 years published
+    python3 scripts/build_data.py --years 2024 2025  # exact years
+    python3 scripts/build_data.py --check            # is a newer year out?
 
 Downloads the yearly ZIPs from Toronto Open Data (cached in data-raw/), then
 writes compact JSON to public/data/:
@@ -19,6 +21,7 @@ import argparse
 import csv
 import io
 import json
+import os
 import re
 import sys
 import urllib.request
@@ -301,7 +304,16 @@ def build(years: list[int], excluded: set[str]) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--years", type=int, nargs="+", default=[date.today().year - 1])
+    which = ap.add_mutually_exclusive_group()
+    which.add_argument("--years", type=int, nargs="+", help="Exact years to use, e.g. --years 2024 2025")
+    which.add_argument(
+        "--latest", type=int, metavar="N", default=2, help="Use the newest N years the City has published (default: 2)"
+    )
+    ap.add_argument(
+        "--check",
+        action="store_true",
+        help="Don't build. Report whether newer years are out than the ones in public/data/meta.json.",
+    )
     ap.add_argument(
         "--exclude-codes",
         nargs="*",
@@ -309,7 +321,23 @@ def main() -> None:
         help="Infraction codes to leave out (default: 3, private property). Pass nothing to keep all.",
     )
     args = ap.parse_args()
-    build(sorted(set(args.years)), set(args.exclude_codes))
+
+    years = sorted(set(args.years)) if args.years else sorted(resource_urls())[-args.latest :]
+
+    if args.check:
+        meta = OUT_DIR / "meta.json"
+        current = json.loads(meta.read_text())["years"] if meta.exists() else []
+        changed = years != current
+        print(f"Published: {years}. In app: {current}. {'Update available.' if changed else 'Up to date.'}")
+        out = os.environ.get("GITHUB_OUTPUT")
+        if out:
+            with open(out, "a") as fh:
+                fh.write(f"changed={'true' if changed else 'false'}\n")
+                fh.write(f"years={' '.join(map(str, years))}\n")
+                fh.write(f"slug={'-'.join(map(str, years))}\n")
+        return
+
+    build(years, set(args.exclude_codes))
 
 
 if __name__ == "__main__":
