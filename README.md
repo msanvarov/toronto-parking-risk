@@ -38,7 +38,7 @@ Things to know:
 
 ## Development
 
-Needs Node 20+ and Python 3.9+.
+Needs Node 20+ (22 recommended, see `.nvmrc`). Python 3.9+ only if you rebuild the data.
 
 ```bash
 npm install
@@ -71,9 +71,33 @@ src/components/         UI pieces
 public/sw.js            offline cache
 ```
 
+## Tech stack
+
+| Part | What it uses |
+| --- | --- |
+| App | React 18 + TypeScript, built with Vite 5 |
+| Styling | Plain CSS with light/dark themes, Plus Jakarta Sans (self-hosted via Fontsource) |
+| Offline / install | Web app manifest + a small hand-written service worker (`public/sw.js`) |
+| Data | Static JSON in `public/data/`, built by a Python 3 script (standard library only) |
+| Location | Browser geolocation + OpenStreetMap Nominatim for street lookup |
+| Tests | Vitest |
+| Backend | None. It's a fully static site, so no server, database or API keys |
+
 ## Deploying
 
-`.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to `main`. In the repo settings, set **Pages → Source** to **GitHub Actions**. Any static host works too: run `npm run build` and serve `dist/`.
+It's a static site: build with `npm run build` and serve the `dist/` folder. No environment variables are needed. The ticket data is already committed, so Python isn't needed at build time.
+
+| Host | Setup |
+| --- | --- |
+| **Netlify** | "Add new site → Import from Git", pick the repo. `netlify.toml` sets the build command, folder, Node version and cache headers. |
+| **Vercel** | Import the repo. It detects Vite automatically (build `npm run build`, output `dist`). |
+| **Cloudflare Pages** | Framework preset "Vite", build command `npm run build`, output `dist`, env var `NODE_VERSION=22`. |
+| **GitHub Pages** | Settings → Pages → Source: **GitHub Actions**. `.github/workflows/deploy.yml` deploys every push to `main`. |
+| **Anywhere else** | Upload the contents of `dist/` to any static host or bucket (S3, Firebase Hosting, Render static site…). |
+
+Hosting under a sub-path (like `example.com/parking/`)? Build with `BASE_PATH=/parking/ npm run build`.
+
+The site needs HTTPS for "Use my location" to work. All the hosts above provide it.
 
 ## Disclaimer
 
