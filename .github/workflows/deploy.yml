@@ -1,8 +1,14 @@
-name: Deploy to GitHub Pages
+name: Test, build and deploy
+
+# Runs the tests and a production build on every push and pull request.
+# Also deploys to GitHub Pages, but only when Pages is turned on
+# (Settings → Pages → Source: GitHub Actions). If you host on Netlify or
+# Vercel instead, leave Pages off and this stays a green CI check.
 
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -11,12 +17,14 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      pages: ${{ steps.pages.outputs.enabled }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,15 +33,33 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: npm run build
+
+      - name: Is GitHub Pages turned on?
+        id: pages
         env:
-          BASE_PATH: /${{ github.event.repository.name }}/
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ] && gh api "repos/${{ github.repository }}/pages" --silent 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping the GitHub Pages deploy (Pages is off, or this is a pull request). Tests and build still ran."
+          fi
+
+      - name: Build
+        run: npm run build
+        env:
+          # GitHub Pages serves the site under /<repo-name>/
+          BASE_PATH: ${{ steps.pages.outputs.enabled == 'true' && format('/{0}/', github.event.repository.name) || '/' }}
+
       - uses: actions/upload-pages-artifact@v3
+        if: steps.pages.outputs.enabled == 'true'
         with:
           path: dist
 
   deploy:
     needs: build
+    if: needs.build.outputs.pages == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

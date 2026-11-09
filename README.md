@@ -112,7 +112,7 @@ It's a static site: build with `npm run build` and serve the `dist/` folder. No 
 | **Netlify** | Click the button above, or "Add new site → Import from Git". `netlify.toml` sets the build command, folder, Node version and cache headers. |
 | **Vercel** | Click the button above, or import the repo. It detects Vite automatically. |
 | **Cloudflare Pages** | Framework preset "Vite", build command `npm run build`, output `dist`, env var `NODE_VERSION=22`. |
-| **GitHub Pages** | Settings → Pages → Source: **GitHub Actions**. `.github/workflows/deploy.yml` deploys every push to `main`. |
+| **GitHub Pages** | Settings → Pages → Source: **GitHub Actions**. `.github/workflows/deploy.yml` then deploys every push to `main`. While Pages is off, that workflow just runs the tests and build. |
 | **Anywhere else** | Upload the contents of `dist/` to any static host or bucket (S3, Firebase Hosting, Render static site…). |
 
 Hosting under a sub-path (like `example.com/parking/`)? Build with `BASE_PATH=/parking/ npm run build`.
