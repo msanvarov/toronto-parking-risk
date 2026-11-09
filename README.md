@@ -8,6 +8,8 @@
 
 Parking-sign green, but on the driver's side. Free, no sign-up, works on any phone.
 
+### [▶ Try it live at toronto-parking-risk.netlify.app](https://toronto-parking-risk.netlify.app)
+
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/msanvarov/toronto-parking-risk)
 &nbsp;
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/msanvarov/toronto-parking-risk)
@@ -109,7 +111,7 @@ It's a static site: build with `npm run build` and serve the `dist/` folder. No 
 
 | Host | Setup |
 | --- | --- |
-| **Netlify** | Click the button above, or "Add new site → Import from Git". `netlify.toml` sets the build command, folder, Node version and cache headers. |
+| **Netlify** | Click the button above, or "Add new site → Import from Git". `netlify.toml` sets the build command, folder and Node version; `public/_headers` sets caching. |
 | **Vercel** | Click the button above, or import the repo. It detects Vite automatically. |
 | **Cloudflare Pages** | Framework preset "Vite", build command `npm run build`, output `dist`, env var `NODE_VERSION=22`. |
 | **GitHub Pages** | Settings → Pages → Source: **GitHub Actions**. `.github/workflows/deploy.yml` then deploys every push to `main`. While Pages is off, that workflow just runs the tests and build. |
