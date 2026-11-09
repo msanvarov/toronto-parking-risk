@@ -193,6 +193,10 @@ export default function App() {
 
       {meta && (
         <footer>
+          <a className="credit" href="https://sal-anvarov.com" target="_blank" rel="noopener">
+            Built by <strong>Sal</strong>
+            <span aria-hidden> ↗</span>
+          </a>
           <p>
             Based on {meta.tickets.toLocaleString()} City of Toronto parking tickets from {meta.from} to {meta.to}
             {meta.excludedCodes.includes("3") && ", not counting private-property tickets"}. Source:{" "}

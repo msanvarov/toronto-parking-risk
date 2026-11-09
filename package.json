@@ -2,6 +2,13 @@
   "name": "toronto-parking-risk",
   "private": true,
   "version": "0.1.0",
+  "description": "Mobile-first web app that scores how likely a parking ticket is on any Toronto block, built from City of Toronto ticket data.",
+  "author": "Sal Anvarov <msalanvarov@gmail.com> (https://sal-anvarov.com)",
+  "homepage": "https://toronto-parking-risk.netlify.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/msanvarov/toronto-parking-risk.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

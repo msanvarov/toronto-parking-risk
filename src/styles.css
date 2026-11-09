@@ -321,6 +321,14 @@ main > * { animation: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-
 
 footer { margin-top: 24px; color: var(--muted); font-size: 0.8rem; }
 footer p { margin: 0 0 8px; }
+.credit {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-bottom: 14px; padding: 8px 14px; border-radius: 999px;
+  background: var(--surface); box-shadow: var(--shadow);
+  color: var(--text); font-size: 0.9rem; text-decoration: none;
+}
+.credit strong { color: var(--accent); }
+.credit:active { transform: scale(0.98); }
 
 .spinner {
   width: 20px; height: 20px; border-radius: 50%;

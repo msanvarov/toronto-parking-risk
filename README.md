@@ -10,6 +10,8 @@ Parking-sign green, but on the driver's side. Free, no sign-up, works on any pho
 
 ### [▶ Try it live at toronto-parking-risk.netlify.app](https://toronto-parking-risk.netlify.app)
 
+Built by **[Sal Anvarov](https://sal-anvarov.com)**
+
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/msanvarov/toronto-parking-risk)
 &nbsp;
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/msanvarov/toronto-parking-risk)
@@ -150,6 +152,10 @@ src/components/         UI pieces
 public/sw.js            offline cache
 docs/                   README screenshots and social preview image
 ```
+
+## Author
+
+Built by **Sal Anvarov**. More of my work at [sal-anvarov.com](https://sal-anvarov.com) and [github.com/msanvarov](https://github.com/msanvarov).
 
 ## Disclaimer
 
