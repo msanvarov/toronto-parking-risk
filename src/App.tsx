@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { DayChart } from "./components/DayChart";
+import { InstallButton, InstallCard } from "./components/InstallPrompt";
 import { RiskGauge } from "./components/RiskGauge";
 import { SearchBox } from "./components/SearchBox";
 import { WhenPicker } from "./components/WhenPicker";
@@ -123,6 +124,7 @@ export default function App() {
             </h1>
             <p className="tagline">On your side, not the meter's.</p>
           </div>
+          <InstallButton />
         </div>
         <SearchBox
           index={index}
@@ -390,7 +392,8 @@ function Intro({
           ))}
         </div>
       </section>
-      <section className="stats" style={{ "--i": 1 } as React.CSSProperties} aria-label="About the data">
+      <InstallCard style={{ "--i": 1 } as React.CSSProperties} />
+      <section className="stats" style={{ "--i": 2 } as React.CSSProperties} aria-label="About the data">
         <div>
           <strong>{(meta.tickets / 1e6).toFixed(1)}M</strong>
           <span>tickets analysed</span>

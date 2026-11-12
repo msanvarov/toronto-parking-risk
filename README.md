@@ -32,10 +32,10 @@ Pull over, tap **"Check where I'm parked"**, and in a second you'll know how har
 
 <table>
   <tr>
-    <td align="center" width="25%"><img src="docs/screenshots/demo.gif" alt="Demo: searching a street, changing how long you're parking, and checking other days" width="240"><br><sub><b>One tap, one answer</b></sub></td>
-    <td align="center" width="25%"><img src="docs/screenshots/result.png" alt="Risk score of 93, very high, for 300 Queen St W" width="240"><br><sub><b>A clear 0–100 score</b></sub></td>
-    <td align="center" width="25%"><img src="docs/screenshots/details.png" alt="Hour-by-hour chart and the most common tickets with their fines" width="240"><br><sub><b>Best and worst times</b></sub></td>
-    <td align="center" width="25%"><img src="docs/screenshots/dark.png" alt="Dark mode" width="240"><br><sub><b>Dark mode built in</b></sub></td>
+    <td align="center" width="25%"><img src="docs/screenshots/demo.gif" alt="Demo: searching a street, changing how long you're parking, and checking other days" width="180"><br><sub><b>One tap, one answer</b></sub></td>
+    <td align="center" width="25%"><img src="docs/screenshots/result.png" alt="Risk score of 93, very high, for 300 Queen St W" width="180"><br><sub><b>A clear 0–100 score</b></sub></td>
+    <td align="center" width="25%"><img src="docs/screenshots/details.png" alt="Hour-by-hour chart and the most common tickets with their fines" width="180"><br><sub><b>Best and worst times</b></sub></td>
+    <td align="center" width="25%"><img src="docs/screenshots/dark.png" alt="Dark mode" width="180"><br><sub><b>Dark mode built in</b></sub></td>
   </tr>
 </table>
 

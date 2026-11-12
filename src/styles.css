@@ -319,6 +319,52 @@ main > * { animation: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-
 .row-main { flex: 1; display: flex; flex-direction: column; font-weight: 600; }
 .chev { font-size: 1.6rem; line-height: 1; color: var(--muted); }
 
+/* ---------- Add to home screen ---------- */
+.install-pill {
+  flex: none; margin-left: auto;
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 36px; padding: 0 12px;
+  border: 1.5px solid rgb(255 255 255 / 0.6); border-radius: 999px;
+  background: rgb(255 255 255 / 0.14); color: var(--on-brand);
+  font-size: 0.82rem; font-weight: 750; white-space: nowrap;
+  backdrop-filter: blur(6px);
+}
+.install-pill:active { background: rgb(255 255 255 / 0.25); }
+
+.install { position: relative; border: 1.5px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+.install-head { display: flex; align-items: center; gap: 12px; padding-right: 28px; }
+.install-head h2 { margin: 0 0 2px; }
+.install-head p { margin: 0 !important; }
+.install-icon { flex: none; width: 48px; height: 48px; border-radius: 12px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.15); }
+.install-close {
+  position: absolute; top: 8px; right: 8px;
+  width: 36px; height: 36px; border: none; border-radius: 50%;
+  background: none; color: var(--muted); font-size: 1.5rem; line-height: 1;
+}
+.install-close:active { background: var(--surface-2); }
+.install-cta { margin-top: 14px; }
+.install-steps { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; counter-reset: step; }
+.install-steps li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); }
+.step-icon {
+  flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px;
+  background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+}
+
+.install-sheet {
+  width: min(520px, 100%); max-width: 100%; max-height: 100dvh;
+  margin: auto auto 0; padding: 0; border: none;
+  border-radius: 24px 24px 0 0;
+  background: var(--surface); color: var(--text);
+}
+.install-sheet[open] { animation: sheet-up 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.install-sheet::backdrop { background: rgb(0 0 0 / 0.45); }
+.install-sheet-body { padding: 22px 18px calc(18px + env(safe-area-inset-bottom)); }
+.install-done {
+  width: 100%; min-height: 52px; margin-top: 16px;
+  border: none; border-radius: 16px; background: var(--accent); color: var(--accent-text); font-weight: 750;
+}
+@keyframes sheet-up { from { transform: translateY(100%); } }
+
 footer { margin-top: 24px; color: var(--muted); font-size: 0.8rem; }
 footer p { margin: 0 0 8px; }
 .credit {
